@@ -1,0 +1,117 @@
+generator client {
+  provider = "prisma-client-js"
+  // output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id Int @id @default(autoincrement())
+  username String? @unique
+  firstName String?
+  lastName String?
+  preferredName String?
+  email String @unique
+  password String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  address String?
+  phone String?
+  auraPoints Int
+  zinPinCode String?
+  dob String?
+  userType String @default("Customer") @map("userType") @db.VarChar(255)
+  isVerified Boolean @default(false)
+  isActive Boolean @default(true)
+  isDeleted Boolean @default(false)
+  about String?
+  profileImage String?
+  institution String?
+  fieldOfStudy String?
+  fieldDescription String?
+  userEvents UserEvent[]
+  userSessions UserSession[]
+  UserInterests UserInterest[]
+  profilePercentage Int @default(0)
+}
+
+model event {
+  id Int @id @default(autoincrement())
+  eventName String
+  eventDescription String
+  eventDate DateTime
+  eventTime String
+  eventLocation String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  eventImage String?
+  createdBy Int
+  status String @default("upcoming")
+  isDeleted Boolean @default(false)
+  userEvents UserEvent[]
+}
+
+model UserEvent {
+  id Int @id @default(autoincrement())
+  userId Int
+  eventId Int
+  user User @relation(fields: [userId], references: [id])
+  event event @relation(fields: [eventId], references: [id])
+
+  @@unique([userId, eventId])
+}
+
+model Session{
+  id Int @default(autoincrement()) @id
+  sessionId String @unique
+  createdAt DateTime @default(now())
+  eventImage String?
+  updatedAt DateTime @updatedAt
+  createdBy Int
+  status String @default("upcoming")
+  isDeleted Boolean @default(false)
+  userSessions UserSession[]
+}
+
+model UserSession {
+  id Int @id @default(autoincrement())
+  userId Int
+  sessionId Int
+  user User @relation(fields: [userId], references: [id])
+  session Session @relation(fields: [sessionId], references: [id])
+
+  @@unique([userId, sessionId])
+}
+
+model Interest {
+  id Int @id @default(autoincrement())
+  interestName String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  description String?
+  createdBy Int
+  isActive Boolean @default(true)
+  isDeleted Boolean @default(false)
+  UserInterests UserInterest[]
+}
+
+model UserInterest {
+  id Int @id @default(autoincrement())
+  userId Int
+  intrestId Int
+  user User @relation(fields: [userId], references: [id])
+  intrest Interest @relation(fields: [intrestId], references: [id])
+
+  @@unique([userId, intrestId])
+}
+
+enum UserType {
+  Admin
+  Customer
+  TA
+  SuperAdmin
+  Creator
+}
