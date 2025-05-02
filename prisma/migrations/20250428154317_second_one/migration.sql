@@ -1,23 +1,53 @@
-/*
-  Warnings:
+-- CreateEnum
+CREATE TYPE "UserType" AS ENUM ('Admin', 'Customer', 'TA', 'SuperAdmin', 'Creator');
 
-  - You are about to drop the column `eventIds` on the `User` table. All the data in the column will be lost.
-  - You are about to drop the column `interestIds` on the `User` table. All the data in the column will be lost.
-  - You are about to drop the column `sessionIds` on the `User` table. All the data in the column will be lost.
-  - You are about to drop the `intrest` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `session` table. If the table is not empty, all the data it contains will be lost.
+-- CreateTable
+CREATE TABLE "User" (
+    "id" SERIAL NOT NULL,
+    "username" TEXT,
+    "firstName" TEXT,
+    "lastName" TEXT,
+    "preferredName" TEXT,
+    "email" TEXT NOT NULL,
+    "password" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "address" TEXT,
+    "phone" TEXT,
+    "auraPoints" INTEGER NOT NULL,
+    "zinPinCode" TEXT,
+    "dob" TEXT,
+    "userType" VARCHAR(255) NOT NULL DEFAULT 'Customer',
+    "isVerified" BOOLEAN NOT NULL DEFAULT false,
+    "isActive" BOOLEAN NOT NULL DEFAULT true,
+    "isDeleted" BOOLEAN NOT NULL DEFAULT false,
+    "about" TEXT,
+    "profileImage" TEXT,
+    "institution" TEXT,
+    "fieldOfStudy" TEXT,
+    "fieldDescription" TEXT,
+    "profilePercentage" INTEGER NOT NULL DEFAULT 0,
 
-*/
--- AlterTable
-ALTER TABLE "User" DROP COLUMN "eventIds",
-DROP COLUMN "interestIds",
-DROP COLUMN "sessionIds";
+    CONSTRAINT "User_pkey" PRIMARY KEY ("id")
+);
 
--- DropTable
-DROP TABLE "intrest";
+-- CreateTable
+CREATE TABLE "event" (
+    "id" SERIAL NOT NULL,
+    "eventName" TEXT NOT NULL,
+    "eventDescription" TEXT NOT NULL,
+    "eventDate" TIMESTAMP(3) NOT NULL,
+    "eventTime" TEXT NOT NULL,
+    "eventLocation" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "eventImage" TEXT,
+    "createdBy" INTEGER NOT NULL,
+    "status" TEXT NOT NULL DEFAULT 'upcoming',
+    "isDeleted" BOOLEAN NOT NULL DEFAULT false,
 
--- DropTable
-DROP TABLE "session";
+    CONSTRAINT "event_pkey" PRIMARY KEY ("id")
+);
 
 -- CreateTable
 CREATE TABLE "UserEvent" (
@@ -73,6 +103,12 @@ CREATE TABLE "UserInterest" (
 
     CONSTRAINT "UserInterest_pkey" PRIMARY KEY ("id")
 );
+
+-- CreateIndex
+CREATE UNIQUE INDEX "User_username_key" ON "User"("username");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "UserEvent_userId_eventId_key" ON "UserEvent"("userId", "eventId");

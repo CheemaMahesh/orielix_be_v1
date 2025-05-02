@@ -1,4 +1,5 @@
 import { Router } from "express";
+
 import {
   SignUpController,
   SigninController,
@@ -14,7 +15,7 @@ userRouter.post("/signup", SignUpController);
 userRouter.post("/login", SigninController);
 
 // Me Routes
-userRouter.get("/me", isValidToken, MeController);
+userRouter.get("/me", MeController);
 
 // Update Routes
 userRouter.put("/update", isValidToken, UpdateUserController);

@@ -9,7 +9,7 @@ datasource db {
 }
 
 model User {
-  id Int @id @default(autoincrement())
+  id String @id 
   username String? @unique
   firstName String?
   lastName String?
@@ -32,80 +32,61 @@ model User {
   institution String?
   fieldOfStudy String?
   fieldDescription String?
-  userEvents UserEvent[]
-  userSessions UserSession[]
-  UserInterests UserInterest[]
   profilePercentage Int @default(0)
+  interests String[]
+  userSessions String[]
+  events String[]
+  sessions String []
 }
 
 model event {
-  id Int @id @default(autoincrement())
+  id String @id
   eventName String
   eventDescription String
-  eventDate DateTime
+  eventDate String
   eventTime String
   eventLocation String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   eventImage String?
-  createdBy Int
+  createdBy String
   status String @default("upcoming")
   isDeleted Boolean @default(false)
-  userEvents UserEvent[]
+  duration String?
+  eventType String?
+  externalLink String?
 }
 
-model UserEvent {
-  id Int @id @default(autoincrement())
-  userId Int
-  eventId Int
-  user User @relation(fields: [userId], references: [id])
-  event event @relation(fields: [eventId], references: [id])
-
-  @@unique([userId, eventId])
-}
 
 model Session{
-  id Int @default(autoincrement()) @id
-  sessionId String @unique
+  id String @id
   createdAt DateTime @default(now())
-  eventImage String?
+  image String?
   updatedAt DateTime @updatedAt
-  createdBy Int
+  createdBy String
   status String @default("upcoming")
-  isDeleted Boolean @default(false)
-  userSessions UserSession[]
+  isDeleted Boolean? @default(false)
+  name String
+  description String
+  externalLink String?
+  type String?
+  duration String?
+  date String
+  time String
+  location String?
+  isActive Boolean? @default(true)
 }
 
-model UserSession {
-  id Int @id @default(autoincrement())
-  userId Int
-  sessionId Int
-  user User @relation(fields: [userId], references: [id])
-  session Session @relation(fields: [sessionId], references: [id])
-
-  @@unique([userId, sessionId])
-}
 
 model Interest {
-  id Int @id @default(autoincrement())
-  interestName String
+  id String @id
+  name String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   description String?
-  createdBy Int
+  createdBy String
   isActive Boolean @default(true)
   isDeleted Boolean @default(false)
-  UserInterests UserInterest[]
-}
-
-model UserInterest {
-  id Int @id @default(autoincrement())
-  userId Int
-  intrestId Int
-  user User @relation(fields: [userId], references: [id])
-  intrest Interest @relation(fields: [intrestId], references: [id])
-
-  @@unique([userId, intrestId])
 }
 
 enum UserType {

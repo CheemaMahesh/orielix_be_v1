@@ -5,19 +5,9 @@ import { v4 as uuidv4 } from "uuid";
 
 const client = new PrismaClient();
 
-export const CreateEventsController = async (req: Request, res: Response) => {
+export const CreateSessionController = async (req: Request, res: Response) => {
   try {
-    console.log("req.body", req.body);
-    console.log("CreateEventsController");
-    const {
-      eventName,
-      eventDescription,
-      eventDate,
-      eventImage,
-      eventTime,
-      eventLocation,
-      userId,
-    } = req.body;
+    const { name, description, date, image, time, userId, duration } = req.body;
     const userDetails = await client.user.findUnique({
       where: {
         id: userId,
@@ -30,8 +20,6 @@ export const CreateEventsController = async (req: Request, res: Response) => {
       (userDetails.userType === "admin" ||
         userDetails.userType === "superAdmin");
 
-    console.log("isValidUserToUpdate", isValidUserToUpdate);
-
     if (!isValidUserToUpdate) {
       res.status(404).json({
         success: false,
@@ -41,12 +29,12 @@ export const CreateEventsController = async (req: Request, res: Response) => {
     }
 
     const eventBody = z.object({
-      eventName: z.string().min(3).max(50),
-      eventDescription: z.string().min(5).max(500),
-      eventDate: z.string(),
-      eventImage: z.string(),
-      eventTime: z.string(),
-      eventLocation: z.string().optional(),
+      name: z.string().min(3).max(50),
+      description: z.string().min(5).max(500),
+      date: z.string(),
+      image: z.string(),
+      time: z.string(),
+      duration: z.string(),
     });
     const isValidBody = eventBody.safeParse(req.body);
     if (!isValidBody.success) {
@@ -58,15 +46,15 @@ export const CreateEventsController = async (req: Request, res: Response) => {
       return;
     }
 
-    const event = await client.event.create({
+    const session = await client.session.create({
       data: {
-        eventName,
-        eventDescription,
-        eventDate,
-        eventImage,
-        eventTime,
-        eventLocation,
-        createdBy: userId,
+        name,
+        description,
+        date,
+        image,
+        time,
+        createdBy: String(userId),
+        duration,
         id: uuidv4(),
       },
     });
@@ -74,7 +62,7 @@ export const CreateEventsController = async (req: Request, res: Response) => {
     res.status(200).json({
       success: true,
       message: "Event created successfully",
-      event,
+      session,
     });
   } catch (err) {
     console.error(err);
@@ -82,9 +70,8 @@ export const CreateEventsController = async (req: Request, res: Response) => {
   }
 };
 
-export const GetEventsController = async (req: Request, res: Response) => {
+export const GetSessionController = async (req: Request, res: Response) => {
   try {
-    console.log("GetEventsController");
     const { userId } = req.body;
     if (!userId) {
       res.status(400).json({
@@ -94,13 +81,13 @@ export const GetEventsController = async (req: Request, res: Response) => {
       return;
     }
 
-    const eventDetails = await client.event.findMany({
+    const sessions = await client.session.findMany({
       where: {
         createdBy: String(userId),
       },
     });
 
-    if (!eventDetails || eventDetails.length === 0) {
+    if (!sessions || sessions.length === 0) {
       res.status(404).json({
         success: false,
         message: "No events found",
@@ -108,12 +95,10 @@ export const GetEventsController = async (req: Request, res: Response) => {
       return;
     }
 
-    console.log("eventDetails", eventDetails);
-
     res.status(200).json({
       success: true,
       message: "Event fetched successfully",
-      eventDetails,
+      sessions,
     });
   } catch (err) {
     console.error(err);
@@ -123,10 +108,10 @@ export const GetEventsController = async (req: Request, res: Response) => {
   }
 };
 
-export const UpdateEventsController = async (req: Request, res: Response) => {
+export const UpdateSessionController = async (req: Request, res: Response) => {
   try {
-    const { eventId, userId } = req.body;
-    if (!eventId || !userId) {
+    const { sessionId, userId } = req.body;
+    if (!sessionId || !userId) {
       res.status(400).json({
         success: false,
         message: "Invalid Request",
@@ -136,28 +121,28 @@ export const UpdateEventsController = async (req: Request, res: Response) => {
 
     let updateBody: Record<string, any> = {};
 
-    if (req.body.eventName && req.body.eventName.trim() !== "") {
-      updateBody.eventName = req.body.eventName;
+    if (req.body.name && req.body.name.trim() !== "") {
+      updateBody.name = req.body.name;
     }
 
-    if (req.body.eventDescription && req.body.eventDescription.trim() !== "") {
-      updateBody.eventDescription = req.body.eventDescription;
+    if (req.body.description && req.body.description.trim() !== "") {
+      updateBody.description = req.body.description;
     }
 
-    if (req.body.eventDate && req.body.eventDate.trim() !== "") {
-      updateBody.eventDate = req.body.eventDate;
+    if (req.body.date && req.body.date.trim() !== "") {
+      updateBody.date = req.body.date;
     }
 
-    if (req.body.eventImage && req.body.eventImage.trim() !== "") {
-      updateBody.eventImage = req.body.eventImage;
+    if (req.body.image && req.body.image.trim() !== "") {
+      updateBody.image = req.body.image;
     }
 
-    if (req.body.eventTime && req.body.eventTime.trim() !== "") {
-      updateBody.eventTime = req.body.eventTime;
+    if (req.body.time && req.body.time.trim() !== "") {
+      updateBody.time = req.body.time;
     }
 
-    if (req.body.eventLocation && req.body.eventLocation.trim() !== "") {
-      updateBody.eventLocation = req.body.eventLocation;
+    if (req.body.location && req.body.location.trim() !== "") {
+      updateBody.location = req.body.location;
     }
 
     if (req.body.isActive !== undefined) {
@@ -174,8 +159,8 @@ export const UpdateEventsController = async (req: Request, res: Response) => {
 
     updateBody.updatedAt = new Date();
 
-    const updatedEvent = await client.event.update({
-      where: { id: eventId },
+    const updatedSession = await client.session.update({
+      where: { id: sessionId },
       data: updateBody,
     });
 
@@ -183,7 +168,7 @@ export const UpdateEventsController = async (req: Request, res: Response) => {
     res.status(200).json({
       success: true,
       message: "Event updated successfully",
-      event: updatedEvent,
+      session: updatedSession,
     });
   } catch (err) {
     console.error(err);

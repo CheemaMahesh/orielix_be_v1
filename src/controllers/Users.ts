@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import z from "zod";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
+import { v4 as uuidv4 } from "uuid";
 
 const client = new PrismaClient();
 
@@ -47,6 +48,7 @@ export const SignUpController = async (req: Request, res: Response) => {
           dob,
           userType: "Customer",
           isVerified: true,
+          id: uuidv4(),
         },
       });
 
