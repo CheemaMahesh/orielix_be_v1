@@ -173,6 +173,9 @@ export const MeController = async (req: Request, res: Response) => {
         fieldOfStudy: user.fieldOfStudy,
         fieldDescription: user.fieldDescription,
         isActice: user.isActive,
+        intrests: user.interests,
+        isActive: user.isActive,
+        isDeleted: user.isDeleted,
       },
     });
   } catch (err) {

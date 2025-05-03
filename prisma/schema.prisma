@@ -89,6 +89,17 @@ model Interest {
   isDeleted Boolean @default(false)
 }
 
+model Role {
+  id String @id
+  name String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  description String?
+  createdBy String
+  isActive Boolean @default(true)
+  isDeleted Boolean @default(false)
+}
+
 enum UserType {
   Admin
   Customer
