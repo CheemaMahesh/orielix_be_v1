@@ -1,5 +1,5 @@
 import { Router } from "express";
-// import { isValidToken } from "../middlewares/auth";
+import { isValidToken } from "../middlewares/auth";
 import {
   CreateEventsController,
   GetEventsController,
@@ -9,6 +9,6 @@ import {
 export const eventRouter = Router();
 
 // Event Routes
-eventRouter.post("/create", CreateEventsController);
-eventRouter.get("/get", GetEventsController);
-eventRouter.patch("/update", UpdateEventsController);
+eventRouter.post("/create", isValidToken, CreateEventsController);
+eventRouter.get("/get", isValidToken, GetEventsController);
+eventRouter.patch("/update", isValidToken, UpdateEventsController);

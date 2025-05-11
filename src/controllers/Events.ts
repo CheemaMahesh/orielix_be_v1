@@ -17,6 +17,7 @@ export const CreateEventsController = async (req: Request, res: Response) => {
       eventTime,
       eventLocation,
       userId,
+      presenterId,
     } = req.body;
     const userDetails = await client.user.findUnique({
       where: {
@@ -24,21 +25,21 @@ export const CreateEventsController = async (req: Request, res: Response) => {
       },
     });
 
-    const isValidUserToUpdate =
-      userDetails &&
-      userDetails.isActive &&
-      (userDetails.userType === "admin" ||
-        userDetails.userType === "superAdmin");
+    // const isValidUserToUpdate =
+    //   userDetails &&
+    //   userDetails.isActive &&
+    //   (userDetails.userType === "admin" ||
+    //     userDetails.userType === "superAdmin");
 
-    console.log("isValidUserToUpdate", isValidUserToUpdate);
+    // console.log("isValidUserToUpdate", isValidUserToUpdate);
 
-    if (!isValidUserToUpdate) {
-      res.status(404).json({
-        success: false,
-        message: "Invalid Request",
-      });
-      return;
-    }
+    // if (!isValidUserToUpdate) {
+    //   res.status(404).json({
+    //     success: false,
+    //     message: "Invalid Request",
+    //   });
+    //   return;
+    // }
 
     const eventBody = z.object({
       eventName: z.string().min(3).max(50),
@@ -47,6 +48,7 @@ export const CreateEventsController = async (req: Request, res: Response) => {
       eventImage: z.string(),
       eventTime: z.string(),
       eventLocation: z.string().optional(),
+      presenterId: z.string().optional(),
     });
     const isValidBody = eventBody.safeParse(req.body);
     if (!isValidBody.success) {
@@ -68,6 +70,7 @@ export const CreateEventsController = async (req: Request, res: Response) => {
         eventLocation,
         createdBy: userId,
         id: uuidv4(),
+        presenterId: presenterId || null,
       },
     });
 
@@ -113,7 +116,7 @@ export const GetEventsController = async (req: Request, res: Response) => {
     res.status(200).json({
       success: true,
       message: "Event fetched successfully",
-      eventDetails,
+      events: eventDetails,
     });
   } catch (err) {
     console.error(err);

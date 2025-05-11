@@ -7,26 +7,35 @@ const client = new PrismaClient();
 
 export const CreateSessionController = async (req: Request, res: Response) => {
   try {
-    const { name, description, date, image, time, userId, duration } = req.body;
-    const userDetails = await client.user.findUnique({
-      where: {
-        id: userId,
-      },
-    });
+    const {
+      name,
+      description,
+      date,
+      image,
+      time,
+      userId,
+      duration,
+      presenterId,
+    } = req.body;
+    // const userDetails = await client.user.findUnique({
+    //   where: {
+    //     id: userId,
+    //   },
+    // });
 
-    const isValidUserToUpdate =
-      userDetails &&
-      userDetails.isActive &&
-      (userDetails.userType === "admin" ||
-        userDetails.userType === "superAdmin");
+    // const isValidUserToUpdate =
+    //   userDetails &&
+    //   userDetails.isActive &&
+    //   (userDetails.userType === "admin" ||
+    //     userDetails.userType === "superAdmin");
 
-    if (!isValidUserToUpdate) {
-      res.status(404).json({
-        success: false,
-        message: "Invalid Request",
-      });
-      return;
-    }
+    // if (!isValidUserToUpdate) {
+    //   res.status(404).json({
+    //     success: false,
+    //     message: "Invalid Request",
+    //   });
+    //   return;
+    // }
 
     const eventBody = z.object({
       name: z.string().min(3).max(50),
@@ -35,6 +44,7 @@ export const CreateSessionController = async (req: Request, res: Response) => {
       image: z.string(),
       time: z.string(),
       duration: z.string(),
+      presenterId: z.string().optional(),
     });
     const isValidBody = eventBody.safeParse(req.body);
     if (!isValidBody.success) {
@@ -56,6 +66,7 @@ export const CreateSessionController = async (req: Request, res: Response) => {
         createdBy: String(userId),
         duration,
         id: uuidv4(),
+        presenterId: presenterId ? String(presenterId) : null,
       },
     });
 

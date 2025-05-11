@@ -9,13 +9,11 @@ const client = new PrismaClient();
 
 export const SignUpController = async (req: Request, res: Response) => {
   try {
-    const { email, password, firstName, lastName, dob } = req.body;
+    const { email, password, username } = req.body;
     const validateUser = z.object({
       email: z.string().email(),
       password: z.string().min(8).max(20),
-      firstName: z.string().min(3).max(20),
-      lastName: z.string().min(3).max(20),
-      dob: z.string().optional(),
+      username: z.string().min(3).max(20),
     });
 
     const isValidBody = validateUser.safeParse(req.body);
@@ -39,13 +37,11 @@ export const SignUpController = async (req: Request, res: Response) => {
       const newUser = await client.user.create({
         data: {
           email,
-          firstName,
-          lastName,
           password: hashedPassword,
+          username,
           auraPoints: 0,
           createdAt: new Date(),
           updatedAt: new Date(),
-          dob,
           userType: "Customer",
           isVerified: true,
           id: uuidv4(),
@@ -176,6 +172,7 @@ export const MeController = async (req: Request, res: Response) => {
         intrests: user.interests,
         isActive: user.isActive,
         isDeleted: user.isDeleted,
+        username: user.username,
       },
     });
   } catch (err) {
@@ -228,6 +225,171 @@ export const UpdateUserController = async (req: Request, res: Response) => {
       success: true,
       message: "User updated successfully",
       user: updatedUser,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+export const GetAllEventsForCustomerController = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const userId = req.body.userId; // From isValidToken middleware
+
+    if (!userId) {
+      res.status(400).json({
+        success: false,
+        message: "User ID is required",
+      });
+      return;
+    }
+
+    // First, get all events
+    const events = await client.event.findMany({
+      where: {
+        isDeleted: false,
+        isActive: true,
+      },
+      include: {
+        presenter: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            profileImage: true,
+            institution: true,
+            about: true,
+            designation: true,
+          },
+        },
+        joinedUsers: {
+          where: {
+            id: userId,
+          },
+          select: {
+            id: true,
+          },
+        },
+        _count: {
+          select: {
+            joinedUsers: true,
+          },
+        },
+      },
+    });
+
+    if (!events || events.length === 0) {
+      res.status(404).json({
+        success: false,
+        message: "No events found",
+      });
+      return;
+    }
+
+    // Get current date (today) without time component
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // Filter for upcoming events and add isAlreadyJoined flag
+    const upcomingEvents = events
+      .filter((event) => {
+        if (!event.eventDate) return false;
+
+        // Parse ISO date string
+        const eventDate = new Date(event.eventDate);
+
+        // If parsing failed, skip this event
+        if (isNaN(eventDate.getTime())) return false;
+
+        // Remove time component for comparison
+        eventDate.setHours(0, 0, 0, 0);
+
+        // Keep if event date is >= today
+        return eventDate >= today;
+      })
+      .map((event) => {
+        // Add isAlreadyJoined flag based on if we found the user in joinedUsers
+        return {
+          ...event,
+          joined: event.joinedUsers.length > 0,
+          // Remove joinedUsers from response to avoid sending a list of all users
+          joinedUsers: undefined,
+        };
+      });
+
+    res.status(200).json({
+      success: true,
+      message: "Events found",
+      events: upcomingEvents,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Internal server error" });
+    return;
+  }
+};
+
+export const getAllSessionsController = async (req: Request, res: Response) => {
+  try {
+    const userId = req.body.userId;
+
+    if (!userId) {
+      res.status(400).json({
+        success: false,
+        message: "User ID is required",
+      });
+      return;
+    }
+
+    const sessions = await client.session.findMany({
+      where: {
+        isDeleted: false,
+      },
+      include: {
+        presenter: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            profileImage: true,
+            institution: true,
+            about: true,
+            designation: true,
+          },
+        },
+        joinedUsers: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            profileImage: true,
+            designation: true,
+            about: true,
+          },
+        },
+        _count: {
+          select: {
+            joinedUsers: true,
+          },
+        },
+      },
+    });
+
+    if (!sessions || sessions.length === 0) {
+      res.status(404).json({
+        success: false,
+        message: "No sessions found",
+      });
+      return;
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Sessions found",
+      sessions,
     });
   } catch (err) {
     console.error(err);

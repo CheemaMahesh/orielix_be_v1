@@ -23,7 +23,7 @@ model User {
   auraPoints Int
   zinPinCode String?
   dob String?
-  userType String @default("Customer") @map("userType") @db.VarChar(255)
+  userType String @default("customer") @map("userType") @db.VarChar(255)
   isVerified Boolean @default(false)
   isActive Boolean @default(true)
   isDeleted Boolean @default(false)
@@ -35,8 +35,11 @@ model User {
   profilePercentage Int @default(0)
   interests String[]
   userSessions String[]
-  events String[]
-  sessions String []
+  presentedEvents event[] @relation("EventPresenters")
+  events event[] @relation("EventJoinedUsers")
+  sessions Session[] @relation("SessionJoinedUsers")
+  presentedSessions Session[] @relation("SessionPresenters")
+  designation String?
 }
 
 model event {
@@ -55,6 +58,11 @@ model event {
   duration String?
   eventType String?
   externalLink String?
+  presenterId String?
+  isActive Boolean? @default(true)
+  presenter User? @relation("EventPresenters", fields: [presenterId], references: [id])
+  joinedUsers User[] @relation("EventJoinedUsers")
+  withbreaks Boolean @default(true)
 }
 
 
@@ -75,6 +83,9 @@ model Session{
   time String
   location String?
   isActive Boolean? @default(true)
+  joinedUsers User[] @relation("SessionJoinedUsers")
+  presenterId String?
+  presenter User? @relation("SessionPresenters", fields: [presenterId], references: [id])
 }
 
 
@@ -101,9 +112,10 @@ model Role {
 }
 
 enum UserType {
-  Admin
-  Customer
-  TA
-  SuperAdmin
-  Creator
+  admin
+  customer
+  ta
+  superadmin
+  creator
+  presenter
 }

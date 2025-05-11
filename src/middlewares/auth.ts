@@ -2,11 +2,16 @@ import { Request, Response, NextFunction } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 
 interface TokenObject extends JwtPayload {
-  userId: string | number;
+  userId: string;
+}
+
+// Add userId directly to the Request interface
+interface AuthRequest extends Request {
+  userId?: string;
 }
 
 export const isValidToken = async (
-  req: Request,
+  req: AuthRequest,
   res: Response,
   next: NextFunction
 ) => {
@@ -16,7 +21,6 @@ export const isValidToken = async (
       ? authHeader.split(" ")[1]
       : null;
 
-    // Check if token exists
     if (!token) {
       res.status(401).json({
         success: false,
@@ -37,10 +41,16 @@ export const isValidToken = async (
       return;
     }
 
-    // Add userId to request body
-    req.body.userId = decoded.userId;
+    // Initialize req.body if it doesn't exist
+    if (!req.body) {
+      req.body = {};
+    }
 
-    // Log successful authentication (optional)
+    // Add userId to both places for maximum compatibility
+    req.userId = decoded.userId;
+    req.body.userId = decoded.userId; // Don't stringify it - keep as original type
+
+    // Log successful authentication
     console.log(`Authenticated user: ${decoded.userId}`);
 
     // Proceed to the next middleware
