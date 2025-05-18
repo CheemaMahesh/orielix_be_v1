@@ -7,8 +7,6 @@ const client = new PrismaClient();
 
 export const CreateEventsController = async (req: Request, res: Response) => {
   try {
-    console.log("req.body", req.body);
-    console.log("CreateEventsController");
     const {
       eventName,
       eventDescription,
@@ -25,21 +23,21 @@ export const CreateEventsController = async (req: Request, res: Response) => {
       },
     });
 
-    // const isValidUserToUpdate =
-    //   userDetails &&
-    //   userDetails.isActive &&
-    //   (userDetails.userType === "admin" ||
-    //     userDetails.userType === "superAdmin");
+    const isValidUserToUpdate =
+      userDetails &&
+      userDetails.isActive &&
+      (userDetails.userType === "admin" ||
+        userDetails.userType === "superAdmin");
 
-    // console.log("isValidUserToUpdate", isValidUserToUpdate);
+    console.log("isValidUserToUpdate", isValidUserToUpdate);
 
-    // if (!isValidUserToUpdate) {
-    //   res.status(404).json({
-    //     success: false,
-    //     message: "Invalid Request",
-    //   });
-    //   return;
-    // }
+    if (!isValidUserToUpdate) {
+      res.status(404).json({
+        success: false,
+        message: "Invalid Request",
+      });
+      return;
+    }
 
     const eventBody = z.object({
       eventName: z.string().min(3).max(50),
@@ -165,6 +163,10 @@ export const UpdateEventsController = async (req: Request, res: Response) => {
 
     if (req.body.isActive !== undefined) {
       updateBody.isActive = Boolean(req.body.isActive);
+    }
+
+    if (req.body.isDeleted !== undefined) {
+      updateBody.isDeleted = Boolean(req.body.isDeleted);
     }
 
     if (Object.keys(updateBody).length === 0) {

@@ -7,6 +7,7 @@ import {
   UpdateUserController,
   GetAllEventsForCustomerController,
   getAllSessionsController,
+  getAllUserByAdmin,
 } from "../controllers/Users";
 import { isValidToken } from "../middlewares/auth";
 import {
@@ -31,6 +32,7 @@ userRouter.post("/signup", SignUpController);
 userRouter.post("/login", SigninController);
 userRouter.get("/me", isValidToken, MeController);
 // userRouter.put("/update", isValidToken, UpdateUserController); //Unfinished
+userRouter.get("/getall", isValidToken, getAllUserByAdmin);
 
 // -------------------------------------Onboarding-------------------------------------
 userRouter.patch("/firststep", OnboardingStepOneController);

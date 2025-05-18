@@ -4,10 +4,11 @@ import {
   GetSessionController,
   UpdateSessionController,
 } from "../controllers/Sessions";
+import { isValidToken } from "../middlewares/auth";
 
 export const sessionRouter = Router();
 
 // Event Routes
-sessionRouter.post("/create", CreateSessionController);
-sessionRouter.get("/get", GetSessionController);
-sessionRouter.patch("/update", UpdateSessionController);
+sessionRouter.post("/create", isValidToken, CreateSessionController);
+sessionRouter.get("/get", isValidToken, GetSessionController);
+sessionRouter.patch("/update", isValidToken, UpdateSessionController);

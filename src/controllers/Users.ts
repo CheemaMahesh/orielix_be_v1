@@ -181,6 +181,52 @@ export const MeController = async (req: Request, res: Response) => {
   }
 };
 
+export const getAllUserByAdmin = async (req: Request, res: Response) => {
+  try {
+    const user = await client.user.findMany({
+      where: {
+        isDeleted: false,
+      },
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        dob: true,
+        createdAt: true,
+        updatedAt: true,
+        userType: true,
+        isVerified: true,
+        profileImage: true,
+        profilePercentage: true,
+        address: true,
+        zinPinCode: true,
+        about: true,
+        institution: true,
+        fieldOfStudy: true,
+        fieldDescription: true,
+      },
+    });
+
+    if (!user || user.length === 0) {
+      res.status(404).json({
+        success: false,
+        message: "No users found",
+      });
+      return;
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Users found",
+      user,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
 export const UpdateUserController = async (req: Request, res: Response) => {
   try {
     const userId = req.body.userId;
@@ -363,11 +409,6 @@ export const getAllSessionsController = async (req: Request, res: Response) => {
         joinedUsers: {
           select: {
             id: true,
-            firstName: true,
-            lastName: true,
-            profileImage: true,
-            designation: true,
-            about: true,
           },
         },
         _count: {
@@ -386,10 +427,15 @@ export const getAllSessionsController = async (req: Request, res: Response) => {
       return;
     }
 
+    const sessionsWithJoinedFlag = sessions.map((session) => ({
+      ...session,
+      joined: session.joinedUsers.some((user) => user.id === userId),
+    }));
+
     res.status(200).json({
       success: true,
       message: "Sessions found",
-      sessions,
+      sessions: sessionsWithJoinedFlag,
     });
   } catch (err) {
     console.error(err);

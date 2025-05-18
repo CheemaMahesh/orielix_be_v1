@@ -17,25 +17,25 @@ export const CreateSessionController = async (req: Request, res: Response) => {
       duration,
       presenterId,
     } = req.body;
-    // const userDetails = await client.user.findUnique({
-    //   where: {
-    //     id: userId,
-    //   },
-    // });
+    const userDetails = await client.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
 
-    // const isValidUserToUpdate =
-    //   userDetails &&
-    //   userDetails.isActive &&
-    //   (userDetails.userType === "admin" ||
-    //     userDetails.userType === "superAdmin");
+    const isValidUserToUpdate =
+      userDetails &&
+      userDetails.isActive &&
+      (userDetails.userType === "admin" ||
+        userDetails.userType === "superAdmin");
 
-    // if (!isValidUserToUpdate) {
-    //   res.status(404).json({
-    //     success: false,
-    //     message: "Invalid Request",
-    //   });
-    //   return;
-    // }
+    if (!isValidUserToUpdate) {
+      res.status(404).json({
+        success: false,
+        message: "Invalid Request",
+      });
+      return;
+    }
 
     const eventBody = z.object({
       name: z.string().min(3).max(50),
@@ -158,6 +158,16 @@ export const UpdateSessionController = async (req: Request, res: Response) => {
 
     if (req.body.isActive !== undefined) {
       updateBody.isActive = Boolean(req.body.isActive);
+    }
+
+    if (req.body.presenterId && req.body.presenterId.trim() !== "") {
+      updateBody.presenterId = req.body.presenterId;
+    }
+    if (req.body.duration && req.body.duration.trim() !== "") {
+      updateBody.duration = req.body.duration;
+    }
+    if (req.body.isDeleted !== undefined) {
+      updateBody.isDeleted = Boolean(req.body.isDeleted);
     }
 
     if (Object.keys(updateBody).length === 0) {

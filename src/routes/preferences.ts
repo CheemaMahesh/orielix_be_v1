@@ -9,13 +9,22 @@ import {
   GetUserRolesController,
   UpdateUserRoleController,
 } from "../controllers/Preferences";
+import { isValidToken } from "../middlewares/auth";
 
 export const preferencesRouter = Router();
 
 // Event Routes
-preferencesRouter.post("/intrest/create", CreateUserIntrestController);
+preferencesRouter.post(
+  "/intrest/create",
+  isValidToken,
+  CreateUserIntrestController
+);
 preferencesRouter.get("/intrest/get", GetUserIntrestController);
-preferencesRouter.patch("/intrest/update", UpdateUserIntrestController);
+preferencesRouter.patch(
+  "/intrest/update",
+  isValidToken,
+  UpdateUserIntrestController
+);
 
 // User Role Routes
 preferencesRouter.post("/role/create", CreateUserRolesController);
