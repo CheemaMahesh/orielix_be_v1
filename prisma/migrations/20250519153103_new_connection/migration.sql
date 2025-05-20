@@ -1,5 +1,5 @@
 -- CreateEnum
-CREATE TYPE "UserType" AS ENUM ('Admin', 'Customer', 'TA', 'SuperAdmin', 'Creator');
+CREATE TYPE "UserType" AS ENUM ('admin', 'customer', 'ta', 'superadmin', 'creator', 'presenter');
 
 -- CreateTable
 CREATE TABLE "User" (
@@ -17,7 +17,7 @@ CREATE TABLE "User" (
     "auraPoints" INTEGER NOT NULL,
     "zinPinCode" TEXT,
     "dob" TEXT,
-    "userType" VARCHAR(255) NOT NULL DEFAULT 'Customer',
+    "userType" VARCHAR(255) NOT NULL DEFAULT 'customer',
     "isVerified" BOOLEAN NOT NULL DEFAULT false,
     "isActive" BOOLEAN NOT NULL DEFAULT true,
     "isDeleted" BOOLEAN NOT NULL DEFAULT false,
@@ -29,8 +29,7 @@ CREATE TABLE "User" (
     "profilePercentage" INTEGER NOT NULL DEFAULT 0,
     "interests" TEXT[],
     "userSessions" TEXT[],
-    "events" TEXT[],
-    "sessions" TEXT[],
+    "designation" TEXT,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
@@ -52,6 +51,9 @@ CREATE TABLE "event" (
     "duration" TEXT,
     "eventType" TEXT,
     "externalLink" TEXT,
+    "presenterId" TEXT,
+    "isActive" BOOLEAN DEFAULT true,
+    "withbreaks" BOOLEAN NOT NULL DEFAULT true,
 
     CONSTRAINT "event_pkey" PRIMARY KEY ("id")
 );
@@ -74,6 +76,7 @@ CREATE TABLE "Session" (
     "time" TEXT NOT NULL,
     "location" TEXT,
     "isActive" BOOLEAN DEFAULT true,
+    "presenterId" TEXT,
 
     CONSTRAINT "Session_pkey" PRIMARY KEY ("id")
 );
@@ -106,8 +109,48 @@ CREATE TABLE "Role" (
     CONSTRAINT "Role_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "_EventJoinedUsers" (
+    "A" TEXT NOT NULL,
+    "B" TEXT NOT NULL,
+
+    CONSTRAINT "_EventJoinedUsers_AB_pkey" PRIMARY KEY ("A","B")
+);
+
+-- CreateTable
+CREATE TABLE "_SessionJoinedUsers" (
+    "A" TEXT NOT NULL,
+    "B" TEXT NOT NULL,
+
+    CONSTRAINT "_SessionJoinedUsers_AB_pkey" PRIMARY KEY ("A","B")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "User_username_key" ON "User"("username");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
+
+-- CreateIndex
+CREATE INDEX "_EventJoinedUsers_B_index" ON "_EventJoinedUsers"("B");
+
+-- CreateIndex
+CREATE INDEX "_SessionJoinedUsers_B_index" ON "_SessionJoinedUsers"("B");
+
+-- AddForeignKey
+ALTER TABLE "event" ADD CONSTRAINT "event_presenterId_fkey" FOREIGN KEY ("presenterId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Session" ADD CONSTRAINT "Session_presenterId_fkey" FOREIGN KEY ("presenterId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_EventJoinedUsers" ADD CONSTRAINT "_EventJoinedUsers_A_fkey" FOREIGN KEY ("A") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_EventJoinedUsers" ADD CONSTRAINT "_EventJoinedUsers_B_fkey" FOREIGN KEY ("B") REFERENCES "event"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_SessionJoinedUsers" ADD CONSTRAINT "_SessionJoinedUsers_A_fkey" FOREIGN KEY ("A") REFERENCES "Session"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_SessionJoinedUsers" ADD CONSTRAINT "_SessionJoinedUsers_B_fkey" FOREIGN KEY ("B") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;

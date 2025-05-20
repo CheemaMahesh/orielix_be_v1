@@ -278,12 +278,211 @@ export const UpdateUserController = async (req: Request, res: Response) => {
   }
 };
 
+export const UpdateIntrestsController = async (req: Request, res: Response) => {
+  try {
+    const { userId, interests } = req.body;
+    if (!userId || !Array.isArray(interests)) {
+      res.status(400).json({
+        success: false,
+        message: "User ID and interests (array) are required",
+      });
+      return;
+    }
+
+    // Fetch current interests
+    const user = await client.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+      return;
+    }
+
+    // Merge and keep only unique interests
+    const mergedInterests = Array.from(
+      new Set([...(user.interests || []), ...interests])
+    );
+
+    const isAuraLessThan1000 = user.auraPoints < 1000;
+
+    const updatedUser = await client.user.update({
+      where: { id: userId },
+      data: {
+        interests: mergedInterests,
+        auraPoints: isAuraLessThan1000
+          ? user.auraPoints + 250
+          : user.auraPoints,
+      },
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Interests updated successfully",
+      user: updatedUser,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+export const DeleteIntrestController = async (req: Request, res: Response) => {
+  try {
+    const { intrestId: intrest } = req.params;
+    const userId = req.body.userId;
+    if (!intrest || !userId) {
+      res.status(400).json({
+        success: false,
+        message: "Interest ID and User ID are required",
+      });
+      return;
+    }
+    const user = await client.user.findUnique({
+      where: {
+        id: userId,
+      },
+      select: {
+        interests: true,
+      },
+    });
+    if (!user) {
+      res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+      return;
+    }
+    const updatedInterests = user.interests.filter(
+      (interest) => interest !== intrest
+    );
+    const updatedUser = await client.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        interests: updatedInterests,
+      },
+    });
+    res.status(200).json({
+      success: true,
+      message: "Interest deleted successfully",
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+export const UpdateNamesController = async (req: Request, res: Response) => {
+  try {
+    const { userId, firstName, lastName } = req.body;
+    if (!userId || !firstName || !lastName) {
+      res.status(400).json({
+        success: false,
+        message: "User ID, first name, and last name are required",
+      });
+      return;
+    }
+
+    if (!firstName) {
+      res.status(400).json({
+        success: false,
+        message: "First name is required",
+      });
+      return;
+    }
+
+    const user = await client.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+    if (!user) {
+      res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+      return;
+    }
+    const isAuraLessThan1000 = user.auraPoints < 1000;
+
+    await client.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        firstName,
+        lastName,
+        auraPoints: isAuraLessThan1000
+          ? user.auraPoints + 250
+          : user.auraPoints,
+      },
+    });
+    res.status(200).json({
+      success: true,
+      message: "Names updated successfully",
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+export const UpdateBioController = async (req: Request, res: Response) => {
+  try {
+    const { userId, bio } = req.body;
+    if (!userId || !bio) {
+      res.status(400).json({
+        success: false,
+        message: "User ID and bio are required",
+      });
+      return;
+    }
+    const user = await client.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+    if (!user) {
+      res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+      return;
+    }
+    const isAuraLessThan1000 = user.auraPoints < 1000;
+
+    await client.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        about: bio,
+        auraPoints: isAuraLessThan1000
+          ? user.auraPoints + 250
+          : user.auraPoints,
+      },
+    });
+    res.status(200).json({
+      success: true,
+      message: "Bio updated successfully",
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
 export const GetAllEventsForCustomerController = async (
   req: Request,
   res: Response
 ) => {
   try {
-    const userId = req.body.userId; // From isValidToken middleware
+    const userId = req.body.userId;
 
     if (!userId) {
       res.status(400).json({
@@ -365,6 +564,7 @@ export const GetAllEventsForCustomerController = async (
           joinedUsers: undefined,
         };
       });
+    console.log("upcomingEvents", upcomingEvents);
 
     res.status(200).json({
       success: true,

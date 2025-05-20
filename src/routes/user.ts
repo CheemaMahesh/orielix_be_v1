@@ -8,6 +8,10 @@ import {
   GetAllEventsForCustomerController,
   getAllSessionsController,
   getAllUserByAdmin,
+  UpdateIntrestsController,
+  DeleteIntrestController,
+  UpdateBioController,
+  UpdateNamesController,
 } from "../controllers/Users";
 import { isValidToken } from "../middlewares/auth";
 import {
@@ -33,6 +37,15 @@ userRouter.post("/login", SigninController);
 userRouter.get("/me", isValidToken, MeController);
 // userRouter.put("/update", isValidToken, UpdateUserController); //Unfinished
 userRouter.get("/getall", isValidToken, getAllUserByAdmin);
+userRouter.post("/intrest/update", isValidToken, UpdateIntrestsController);
+userRouter.delete(
+  "/delete/intrest/:intrestId",
+  isValidToken,
+  DeleteIntrestController
+);
+
+userRouter.patch("/update/bio", isValidToken, UpdateBioController);
+userRouter.patch("/update/names", isValidToken, UpdateNamesController);
 
 // -------------------------------------Onboarding-------------------------------------
 userRouter.patch("/firststep", OnboardingStepOneController);
@@ -49,7 +62,6 @@ userRouter.get(
   GetAllEventsForCustomerController
 );
 userRouter.get("/getallsessions", isValidToken, getAllSessionsController);
-
 // -----------------------------------Join or Leave -------------------------------------
 userRouter.post("/join/event/:eventId", isValidToken, joinInEventController);
 userRouter.post("/leave/event/:eventId", isValidToken, leaveEventController);
