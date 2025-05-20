@@ -29,8 +29,6 @@ export const CreateEventsController = async (req: Request, res: Response) => {
       (userDetails.userType === "admin" ||
         userDetails.userType === "superAdmin");
 
-    console.log("isValidUserToUpdate", isValidUserToUpdate);
-
     if (!isValidUserToUpdate) {
       res.status(404).json({
         success: false,
@@ -85,7 +83,6 @@ export const CreateEventsController = async (req: Request, res: Response) => {
 
 export const GetEventsController = async (req: Request, res: Response) => {
   try {
-    console.log("GetEventsController");
     const { userId } = req.body;
     if (!userId) {
       res.status(400).json({
@@ -108,8 +105,6 @@ export const GetEventsController = async (req: Request, res: Response) => {
       });
       return;
     }
-
-    console.log("eventDetails", eventDetails);
 
     res.status(200).json({
       success: true,

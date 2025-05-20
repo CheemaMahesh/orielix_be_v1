@@ -340,8 +340,6 @@ export const joinInEventController = async (req: Request, res: Response) => {
       });
       return;
     }
-    console.log("Event ID:", eventId);
-    console.log("User ID:", userId);
     const validateJoinEvent = z.object({
       userId: z.string().uuid(),
     });

@@ -564,7 +564,6 @@ export const GetAllEventsForCustomerController = async (
           joinedUsers: undefined,
         };
       });
-    console.log("upcomingEvents", upcomingEvents);
 
     res.status(200).json({
       success: true,
