@@ -12,6 +12,7 @@ import {
   DeleteIntrestController,
   UpdateBioController,
   UpdateNamesController,
+  JoinWithGoogleAuth,
 } from "../controllers/Users";
 import { isValidToken } from "../middlewares/auth";
 import {
@@ -75,3 +76,6 @@ userRouter.post(
   isValidToken,
   LeaveSessionController
 );
+
+// -------------------------------------Google Auth - --------------------------------------
+userRouter.post("/google", JoinWithGoogleAuth);

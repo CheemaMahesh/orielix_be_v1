@@ -641,3 +641,83 @@ export const getAllSessionsController = async (req: Request, res: Response) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
+
+export const JoinWithGoogleAuth = async (req: Request, res: Response) => {
+  try {
+    const { email, firstName, profileImage } = req.body;
+    const validateUser = z.object({
+      email: z.string().email(),
+      firstName: z.string().min(3).max(20),
+      profileImage: z.string(),
+    });
+    const isValidBody = validateUser.safeParse(req.body);
+    if (!isValidBody.success) {
+      res.status(400).json({
+        success: false,
+        message: "Invalid request body",
+        errors: isValidBody.error.flatten(),
+      });
+      return;
+    }
+    const existingUser = await client.user.findFirst({
+      where: {
+        email,
+      },
+    });
+    if (existingUser?.email) {
+      const token = jwt.sign(
+        { userId: existingUser.id },
+        process.env.JWT_SECRET!
+      );
+      res.status(200).json({
+        success: true,
+        message: "Login successful",
+        token,
+      });
+      return;
+    }
+    const newUser = await client.user.create({
+      data: {
+        email,
+        firstName,
+        lastName: "",
+        profileImage,
+        address: "",
+        zinPinCode: "",
+        about: "",
+        institution: "",
+        fieldOfStudy: "",
+        fieldDescription: "",
+        dob: "",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        userType: "Customer",
+        isVerified: true,
+        isActive: true,
+        isDeleted: false,
+        profilePercentage: 0,
+        interests: [],
+        auraPoints: 0,
+        id: uuidv4(),
+        password: "",
+        isJoinedWithGoogle: true,
+      },
+    });
+    if (!newUser.id) {
+      res.status(500).json({
+        success: false,
+        message: "Something went wrong, please try again",
+      });
+      return;
+    }
+    const token = jwt.sign({ userId: newUser.id }, process.env.JWT_SECRET!);
+    res.status(200).json({
+      success: true,
+      message: "Signup successful",
+      token,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
