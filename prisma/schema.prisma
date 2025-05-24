@@ -41,6 +41,13 @@ model User {
   presentedSessions Session[] @relation("SessionPresenters")
   designation String?
   isJoinedWithGoogle Boolean @default(false)
+  portfolioLink String?
+  githubLink String?
+  linkedinLink String?
+  twitterLink String?
+  facebookLink String?
+  instagramLink String?
+  youtubeLink String?
 }
 
 model event {

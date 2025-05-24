@@ -13,6 +13,7 @@ import {
   UpdateBioController,
   UpdateNamesController,
   JoinWithGoogleAuth,
+  UpdateSocialController,
 } from "../controllers/Users";
 import { isValidToken } from "../middlewares/auth";
 import {
@@ -47,11 +48,12 @@ userRouter.delete(
 
 userRouter.patch("/update/bio", isValidToken, UpdateBioController);
 userRouter.patch("/update/names", isValidToken, UpdateNamesController);
+userRouter.patch("/update/social", isValidToken, UpdateSocialController);
 
 // -------------------------------------Onboarding-------------------------------------
-userRouter.patch("/firststep", OnboardingStepOneController);
+userRouter.patch("/firststep", isValidToken, OnboardingStepOneController);
 userRouter.patch("/secondstep", OnboardingStepTwoController);
-userRouter.patch("/thirdstep", OnboardingStepThreeController);
+userRouter.patch("/education", isValidToken, OnboardingStepThreeController);
 userRouter.patch("/fourthstep", OnboardingStepFourController);
 
 // -------------------------------------Onboarding-User-Preferences-------------------------------------

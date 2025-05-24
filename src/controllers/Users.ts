@@ -173,6 +173,10 @@ export const MeController = async (req: Request, res: Response) => {
         isActive: user.isActive,
         isDeleted: user.isDeleted,
         username: user.username,
+        portfolioLink: user.portfolioLink,
+        githubLink: user.githubLink,
+        linkedinLink: user.linkedinLink,
+        phone: user.phone,
       },
     });
   } catch (err) {
@@ -715,6 +719,56 @@ export const JoinWithGoogleAuth = async (req: Request, res: Response) => {
       success: true,
       message: "Signup successful",
       token,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+export const UpdateSocialController = async (req: Request, res: Response) => {
+  try {
+    const { userId, portfolioLink, githubLink, linkedinLink } = req.body;
+    const validateUser = z.object({
+      userId: z.string(),
+      portfolioLink: z.string().min(10).max(200),
+      githubLink: z.string().min(10).max(200),
+      linkedinLink: z.string().min(10).max(200),
+    });
+    const isValidBody = validateUser.safeParse(req.body);
+    if (!isValidBody.success) {
+      res.status(400).json({
+        success: false,
+        message: "Invalid request body",
+        errors: isValidBody.error.flatten(),
+      });
+      return;
+    }
+    const user = await client.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+    if (!user) {
+      res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+      return;
+    }
+    await client.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        portfolioLink,
+        githubLink,
+        linkedinLink,
+      },
+    });
+    res.status(200).json({
+      success: true,
+      message: "Social links updated successfully",
     });
   } catch (err) {
     console.error(err);
