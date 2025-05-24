@@ -48,6 +48,9 @@ model User {
   facebookLink String?
   instagramLink String?
   youtubeLink String?
+  country String? @default("India")
+  state String?
+  city String?
 }
 
 model event {

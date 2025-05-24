@@ -177,6 +177,9 @@ export const MeController = async (req: Request, res: Response) => {
         githubLink: user.githubLink,
         linkedinLink: user.linkedinLink,
         phone: user.phone,
+        country: user.country,
+        state: user.state,
+        city: user.city,
       },
     });
   } catch (err) {
@@ -769,6 +772,60 @@ export const UpdateSocialController = async (req: Request, res: Response) => {
     res.status(200).json({
       success: true,
       message: "Social links updated successfully",
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+export const UpdateAddressController = async (req: Request, res: Response) => {
+  try {
+    const { userId, address, zinPinCode, country, state, city } = req.body;
+    const validateUser = z.object({
+      userId: z.string(),
+      address: z.string().optional(),
+      zinPinCode: z.string().min(5).max(10),
+      country: z.string().min(2).max(50),
+      state: z.string().min(2).max(50),
+      city: z.string().min(2).max(50),
+    });
+    const isValidBody = validateUser.safeParse(req.body);
+    if (!isValidBody.success) {
+      res.status(400).json({
+        success: false,
+        message: "Invalid request body",
+        errors: isValidBody.error.flatten(),
+      });
+      return;
+    }
+    const user = await client.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+    if (!user) {
+      res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+      return;
+    }
+    await client.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        address,
+        zinPinCode,
+        country,
+        state,
+        city,
+      },
+    });
+    res.status(200).json({
+      success: true,
+      message: "Address updated successfully",
     });
   } catch (err) {
     console.error(err);
