@@ -109,7 +109,12 @@ async function updateUserRankings() {
   console.log("User rankings updated at", new Date().toISOString());
 }
 
-// Schedule the job to run every 5 minutes
+// Schedule the job to run every 1 minutes
 cron.schedule("*/1 * * * *", () => {
   updateUserRankings().catch(console.error);
 });
+
+// Schedule the job to run every 12 hours (at minute 0, hour 0 and 12)
+// cron.schedule("0 */12 * * *", () => {
+//   updateUserRankings().catch(console.error);
+// });

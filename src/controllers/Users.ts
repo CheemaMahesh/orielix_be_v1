@@ -180,6 +180,9 @@ export const MeController = async (req: Request, res: Response) => {
         country: user.country,
         state: user.state,
         city: user.city,
+        countryRank: user.countryRank,
+        stateRank: user.stateRank,
+        institutionRank: user.institutionRank,
       },
     });
   } catch (err) {
@@ -909,6 +912,101 @@ export const GetRankingsController = async (req: Request, res: Response) => {
         institutionTopRankers:
           institutionFirstUser?.length > 0 ? institutionFirstUser : [],
       },
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+// ----------------------Dummy test users=----------------------
+// import { Request, Response } from "express";
+// import { PrismaClient } from "@prisma/client";
+// import bcrypt from "bcrypt";
+// import { v4 as uuidv4 } from "uuid";
+
+// const client = new PrismaClient();
+
+export const CreateTestUsersController = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const country = "India";
+    const institution = "IIT Test";
+    const states = ["State1", "State2", "State3"];
+    const usersData = [];
+
+    // Helper to get random auraPoints between 100 and 1000
+    const getAuraPoints = () => Math.floor(Math.random() * 901) + 100;
+
+    // 4 users in State1
+    for (let i = 1; i <= 4; i++) {
+      usersData.push({
+        email: `testuser${i}@example.com`,
+        password: await bcrypt.hash(`Password${i}!`, 8),
+        username: `testuser${i}`,
+        country,
+        state: states[0],
+        institution,
+        id: uuidv4(),
+        isVerified: true,
+        isActive: true,
+        isDeleted: false,
+        auraPoints: getAuraPoints(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        userType: "Customer",
+      });
+    }
+    // 4 users in State2
+    for (let i = 5; i <= 8; i++) {
+      usersData.push({
+        email: `testuser${i}@example.com`,
+        password: await bcrypt.hash(`Password${i}!`, 8),
+        username: `testuser${i}`,
+        country,
+        state: states[1],
+        institution,
+        id: uuidv4(),
+        isVerified: true,
+        isActive: true,
+        isDeleted: false,
+        auraPoints: getAuraPoints(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        userType: "Customer",
+      });
+    }
+    // 2 users in State3
+    for (let i = 9; i <= 10; i++) {
+      usersData.push({
+        email: `testuser${i}@example.com`,
+        password: await bcrypt.hash(`Password${i}!`, 8),
+        username: `testuser${i}`,
+        country,
+        state: states[2],
+        institution,
+        id: uuidv4(),
+        isVerified: true,
+        isActive: true,
+        isDeleted: false,
+        auraPoints: getAuraPoints(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        userType: "Customer",
+      });
+    }
+
+    const createdUsers = await client.user.createMany({
+      data: usersData,
+      skipDuplicates: true,
+    });
+
+    res.status(201).json({
+      success: true,
+      message: "10 test users created successfully",
+      count: createdUsers.count,
     });
   } catch (err) {
     console.error(err);

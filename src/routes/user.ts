@@ -16,6 +16,7 @@ import {
   UpdateSocialController,
   UpdateAddressController,
   GetRankingsController,
+  CreateTestUsersController,
 } from "../controllers/Users";
 import { isValidToken } from "../middlewares/auth";
 import {
@@ -47,7 +48,10 @@ userRouter.delete(
   isValidToken,
   DeleteIntrestController
 );
+
+// -------------------------------------Rankings-------------------------------------
 userRouter.get("/rankings", isValidToken, GetRankingsController);
+// /---------------------------------------------------
 
 userRouter.patch("/update/bio", isValidToken, UpdateBioController);
 userRouter.patch("/update/names", isValidToken, UpdateNamesController);
@@ -85,3 +89,6 @@ userRouter.post(
 
 // -------------------------------------Google Auth - --------------------------------------
 userRouter.post("/google", JoinWithGoogleAuth);
+
+// -------------------------------------create test users-------------------------------------
+userRouter.post("/create/test", CreateTestUsersController);
