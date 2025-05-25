@@ -692,7 +692,6 @@ export const JoinWithGoogleAuth = async (req: Request, res: Response) => {
         address: "",
         zinPinCode: "",
         about: "",
-        institution: "",
         fieldOfStudy: "",
         fieldDescription: "",
         dob: "",
@@ -826,6 +825,90 @@ export const UpdateAddressController = async (req: Request, res: Response) => {
     res.status(200).json({
       success: true,
       message: "Address updated successfully",
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+export const GetRankingsController = async (req: Request, res: Response) => {
+  try {
+    const country = (req.query.country as string) || "India";
+    const state = (req.query.state as string) || "Rajasthan";
+    const institution = (req.query.institution as string) || "---";
+    const countryFirstUser = await client.user.findMany({
+      where: {
+        countryRank: { in: [1, 2, 3] },
+        country: country || "India",
+      },
+      orderBy: {
+        stateRank: "asc",
+      },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        // profileImage: true,
+        auraPoints: true,
+        countryRank: true,
+        email: true,
+      },
+    });
+
+    const stateFirstUser = await client.user.findMany({
+      where: {
+        country: country || "India",
+        state: state || "Rajasthan",
+        stateRank: { in: [1, 2, 3] },
+      },
+      orderBy: {
+        stateRank: "asc",
+      },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        // profileImage: true,
+        auraPoints: true,
+        countryRank: true,
+        stateRank: true,
+        email: true,
+      },
+    });
+
+    const institutionFirstUser = await client.user.findMany({
+      where: {
+        country: country || "India",
+        state: state || "Rajasthan",
+        institution: institution || "---",
+        institutionRank: { in: [1, 2, 3] },
+      },
+      orderBy: {
+        institutionRank: "asc",
+      },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        // profileImage: true,
+        auraPoints: true,
+        countryRank: true,
+        stateRank: true,
+        institutionRank: true,
+        email: true,
+      },
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Rankings  fetched successfully",
+      rankings: {
+        countryTopRankers: countryFirstUser?.length > 0 ? countryFirstUser : [],
+        stateTopRankers: stateFirstUser?.length > 0 ? stateFirstUser : [],
+        institutionTopRankers:
+          institutionFirstUser?.length > 0 ? institutionFirstUser : [],
+      },
     });
   } catch (err) {
     console.error(err);

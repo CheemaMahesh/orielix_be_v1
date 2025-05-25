@@ -29,7 +29,7 @@ model User {
   isDeleted Boolean @default(false)
   about String?
   profileImage String?
-  institution String?
+  institution String? @default("---")
   fieldOfStudy String?
   fieldDescription String?
   profilePercentage Int @default(0)
@@ -49,8 +49,11 @@ model User {
   instagramLink String?
   youtubeLink String?
   country String? @default("India")
-  state String?
-  city String?
+  state String? @default("Rajasthan")
+  city String? @default("Jaipur")
+  stateRank Int?
+  countryRank Int?
+  institutionRank Int?
 }
 
 model event {

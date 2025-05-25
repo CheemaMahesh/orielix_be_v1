@@ -4,6 +4,7 @@ import { userRouter } from "./routes/user";
 import { eventRouter } from "./routes/event";
 import { sessionRouter } from "./routes/sesssion";
 import { preferencesRouter } from "./routes/preferences";
+import "./jobs/updateUserRankings";
 
 const app = express();
 const PORT = process.env.PORT || 3000;

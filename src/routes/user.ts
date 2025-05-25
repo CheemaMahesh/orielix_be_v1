@@ -15,6 +15,7 @@ import {
   JoinWithGoogleAuth,
   UpdateSocialController,
   UpdateAddressController,
+  GetRankingsController,
 } from "../controllers/Users";
 import { isValidToken } from "../middlewares/auth";
 import {
@@ -46,6 +47,7 @@ userRouter.delete(
   isValidToken,
   DeleteIntrestController
 );
+userRouter.get("/rankings", isValidToken, GetRankingsController);
 
 userRouter.patch("/update/bio", isValidToken, UpdateBioController);
 userRouter.patch("/update/names", isValidToken, UpdateNamesController);
