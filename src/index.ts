@@ -4,6 +4,7 @@ import { userRouter } from "./routes/user";
 import { eventRouter } from "./routes/event";
 import { sessionRouter } from "./routes/sesssion";
 import { preferencesRouter } from "./routes/preferences";
+import { notificationsRouter } from "./routes/notifications";
 // import "./jobs/updateUserRankings";
 
 const app = express();
@@ -17,6 +18,7 @@ app.use("/api/v1/user", userRouter);
 app.use("/api/v1/event", eventRouter);
 app.use("/api/v1/session", sessionRouter);
 app.use("/api/v1/preferences", preferencesRouter);
+app.use("/api/v1/notifications", notificationsRouter);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port:${PORT}`);

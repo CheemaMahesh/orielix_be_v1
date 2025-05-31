@@ -54,6 +54,7 @@ model User {
   stateRank Int?
   countryRank Int?
   institutionRank Int?
+  Notifications Notifications[]
 }
 
 model event {
@@ -77,6 +78,20 @@ model event {
   presenter User? @relation("EventPresenters", fields: [presenterId], references: [id])
   joinedUsers User[] @relation("EventJoinedUsers")
   withbreaks Boolean @default(true)
+}
+
+model Notifications {
+  type String
+  id String @id
+  title String
+  description String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId String?
+  user User? @relation(fields: [userId], references: [id])
+  isRead Boolean @default(false)
+  isDeleted Boolean @default(false)
+  status String @default("unread")
 }
 
 

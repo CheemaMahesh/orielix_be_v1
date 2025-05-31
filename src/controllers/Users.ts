@@ -48,6 +48,23 @@ export const SignUpController = async (req: Request, res: Response) => {
         },
       });
 
+      await client.notifications.create({
+        data: {
+          id: uuidv4(),
+          userId: newUser.id,
+          title:
+            "Thank you for signing up! We are excited to have you on board.",
+          description:
+            "Welcome to our platform! We hope you enjoy your experience.",
+          type: "WELCOME",
+          isRead: false,
+          status: "ACTIVE",
+          isDeleted: false,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      });
+
       if (!newUser.id) {
         res.json(500).json({
           success: false,
