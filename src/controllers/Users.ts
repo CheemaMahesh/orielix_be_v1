@@ -55,8 +55,23 @@ export const SignUpController = async (req: Request, res: Response) => {
           title:
             "Thank you for signing up! We are excited to have you on board.",
           description:
-            "Welcome to our platform! We hope you enjoy your experience.",
+            "Welcome to our Orielix! We hope you enjoy your experience.",
           type: "WELCOME",
+          isRead: false,
+          status: "ACTIVE",
+          isDeleted: false,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      });
+      await client.notifications.create({
+        data: {
+          id: uuidv4(),
+          userId: newUser.id,
+          title: "Please complete your profile to get the most out of Orielix.",
+          description:
+            "Completing your profile helps us tailor the experience to your interests and needs. and gives you Aura Points.",
+          type: "COMPLETE_PROFILE",
           isRead: false,
           status: "ACTIVE",
           isDeleted: false,

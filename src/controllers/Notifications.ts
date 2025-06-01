@@ -10,8 +10,8 @@ export const GetAllNotificationsController = async (
 
   try {
     const notifications = await prisma.notifications.findMany({
-      where: { userId, isRead: false, isDeleted: false },
-      orderBy: { createdAt: "desc" },
+      where: { userId, isDeleted: false },
+      orderBy: [{ isRead: "asc" }, { createdAt: "desc" }],
       select: {
         id: true,
         type: true,
@@ -26,18 +26,43 @@ export const GetAllNotificationsController = async (
     if (notifications.length === 0) {
       res.status(200).json({
         message: "No notifications found.",
-        isSuccess: true,
+        success: true,
         notifications: [],
       });
     }
 
     res.status(200).json({
       message: "Notifications fetched successfully.",
-      isSuccess: true,
+      success: true,
       notifications,
     });
   } catch (error) {
     console.error("Error fetching notifications:", error);
+    res.status(500).json({ message: "Internal server error." });
+  } finally {
+    await prisma.$disconnect();
+  }
+};
+
+export const MarkNotificationAsReadController = async (
+  req: Request,
+  res: Response
+) => {
+  const prisma = new PrismaClient();
+  const notificationId = req.params.notificationId;
+
+  try {
+    await prisma.notifications.update({
+      where: { id: notificationId },
+      data: { isRead: true },
+    });
+
+    res.status(200).json({
+      message: "Notification marked as read successfully.",
+      success: true,
+    });
+  } catch (error) {
+    console.error("Error marking notification as read:", error);
     res.status(500).json({ message: "Internal server error." });
   } finally {
     await prisma.$disconnect();

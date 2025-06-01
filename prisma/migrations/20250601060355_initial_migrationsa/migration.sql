@@ -23,13 +23,27 @@ CREATE TABLE "User" (
     "isDeleted" BOOLEAN NOT NULL DEFAULT false,
     "about" TEXT,
     "profileImage" TEXT,
-    "institution" TEXT,
+    "institution" TEXT DEFAULT '---',
     "fieldOfStudy" TEXT,
     "fieldDescription" TEXT,
     "profilePercentage" INTEGER NOT NULL DEFAULT 0,
     "interests" TEXT[],
     "userSessions" TEXT[],
     "designation" TEXT,
+    "isJoinedWithGoogle" BOOLEAN NOT NULL DEFAULT false,
+    "portfolioLink" TEXT,
+    "githubLink" TEXT,
+    "linkedinLink" TEXT,
+    "twitterLink" TEXT,
+    "facebookLink" TEXT,
+    "instagramLink" TEXT,
+    "youtubeLink" TEXT,
+    "country" TEXT DEFAULT 'India',
+    "state" TEXT DEFAULT 'Rajasthan',
+    "city" TEXT DEFAULT 'Jaipur',
+    "stateRank" INTEGER,
+    "countryRank" INTEGER,
+    "institutionRank" INTEGER,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
@@ -56,6 +70,22 @@ CREATE TABLE "event" (
     "withbreaks" BOOLEAN NOT NULL DEFAULT true,
 
     CONSTRAINT "event_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Notifications" (
+    "type" TEXT NOT NULL,
+    "id" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    "description" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "userId" TEXT,
+    "isRead" BOOLEAN NOT NULL DEFAULT false,
+    "isDeleted" BOOLEAN NOT NULL DEFAULT false,
+    "status" TEXT NOT NULL DEFAULT 'unread',
+
+    CONSTRAINT "Notifications_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -139,6 +169,9 @@ CREATE INDEX "_SessionJoinedUsers_B_index" ON "_SessionJoinedUsers"("B");
 
 -- AddForeignKey
 ALTER TABLE "event" ADD CONSTRAINT "event_presenterId_fkey" FOREIGN KEY ("presenterId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Notifications" ADD CONSTRAINT "Notifications_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Session" ADD CONSTRAINT "Session_presenterId_fkey" FOREIGN KEY ("presenterId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;

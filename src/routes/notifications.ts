@@ -1,6 +1,9 @@
 import { Router } from "express";
 import { isValidToken } from "../middlewares/auth";
-import { GetAllNotificationsController } from "../controllers/Notifications";
+import {
+  GetAllNotificationsController,
+  MarkNotificationAsReadController,
+} from "../controllers/Notifications";
 
 export const notificationsRouter = Router();
 
@@ -9,4 +12,10 @@ notificationsRouter.get(
   "/getall/:userId",
   isValidToken,
   GetAllNotificationsController
+);
+
+notificationsRouter.patch(
+  "/markasread/:notificationId",
+  isValidToken,
+  MarkNotificationAsReadController
 );
