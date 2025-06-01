@@ -17,6 +17,8 @@ import {
   UpdateAddressController,
   GetRankingsController,
   CreateTestUsersController,
+  UpdateUserProfileController,
+  UpdateUserProfileWithIdController,
 } from "../controllers/Users";
 import { isValidToken } from "../middlewares/auth";
 import {
@@ -92,3 +94,16 @@ userRouter.post("/google", JoinWithGoogleAuth);
 
 // -------------------------------------create test users-------------------------------------
 userRouter.post("/create/test", CreateTestUsersController);
+
+// -------------------------------------UploadProfile-------------------------------------
+userRouter.get(
+  "/upload/profilekeys",
+  isValidToken,
+  UpdateUserProfileController
+);
+
+userRouter.patch(
+  "/upload/profile",
+  isValidToken,
+  UpdateUserProfileWithIdController
+);

@@ -4,8 +4,14 @@ import z from "zod";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { v4 as uuidv4 } from "uuid";
+import ImageKit from "imagekit";
 
 const client = new PrismaClient();
+const imagekit = new ImageKit({
+  publicKey: process.env.IMAGEKIT_PUBLIC_KEY || "",
+  privateKey: process.env.IMAGEKIT_PRIVATE_KEY || "",
+  urlEndpoint: process.env.IMAGEKIT_URL_ENDPOINT || "",
+});
 
 export const SignUpController = async (req: Request, res: Response) => {
   try {
@@ -1039,6 +1045,81 @@ export const CreateTestUsersController = async (
       success: true,
       message: "10 test users created successfully",
       count: createdUsers.count,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+export const UpdateUserProfileController = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const authParams = imagekit.getAuthenticationParameters();
+    const result = {
+      ...authParams,
+      publicKey: process.env.IMAGEKIT_PUBLIC_KEY || "your_public_key",
+    };
+    res.send(result);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+export const UpdateUserProfileWithIdController = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const { userId, profileImage, id } = req.body;
+    const validateUser = z.object({
+      userId: z.string(),
+      profileImage: z.string(),
+      id: z.string(),
+    });
+    const isValidBody = validateUser.safeParse(req.body);
+    if (!isValidBody.success) {
+      res.status(400).json({
+        success: false,
+        message: "Invalid request body",
+        errors: isValidBody.error.flatten(),
+      });
+    }
+    if (!userId || !profileImage) {
+      res.status(400).json({
+        success: false,
+        message: "User ID and profile image are required",
+      });
+      return;
+    }
+
+    const user = await client.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+      return;
+    }
+
+    await client.user.update({
+      where: { id: userId },
+      data: {
+        profileImage,
+        profileImageId: id,
+        updatedAt: new Date(),
+      },
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Profile image updated successfully",
     });
   } catch (err) {
     console.error(err);

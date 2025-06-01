@@ -55,6 +55,7 @@ model User {
   countryRank Int?
   institutionRank Int?
   Notifications Notifications[]
+  profileImageId String?
 }
 
 model event {
