@@ -16,6 +16,7 @@ export const CreateEventsController = async (req: Request, res: Response) => {
       eventLocation,
       userId,
       presenterId,
+      duration,
     } = req.body;
     const userDetails = await client.user.findUnique({
       where: {
@@ -45,6 +46,7 @@ export const CreateEventsController = async (req: Request, res: Response) => {
       eventTime: z.string(),
       eventLocation: z.string().optional(),
       presenterId: z.string().optional(),
+      duration: z.string().optional(),
     });
     const isValidBody = eventBody.safeParse(req.body);
     if (!isValidBody.success) {
@@ -67,6 +69,7 @@ export const CreateEventsController = async (req: Request, res: Response) => {
         createdBy: userId,
         id: uuidv4(),
         presenterId: presenterId || null,
+        duration: duration || null,
       },
     });
 
@@ -162,6 +165,10 @@ export const UpdateEventsController = async (req: Request, res: Response) => {
 
     if (req.body.isDeleted !== undefined) {
       updateBody.isDeleted = Boolean(req.body.isDeleted);
+    }
+
+    if (req.body.duration && req.body.duration.trim() !== "") {
+      updateBody.duration = req.body.duration;
     }
 
     if (Object.keys(updateBody).length === 0) {
