@@ -29,6 +29,7 @@ export const GetAllNotificationsController = async (
         success: true,
         notifications: [],
       });
+      return;
     }
 
     res.status(200).json({

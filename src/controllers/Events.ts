@@ -47,6 +47,7 @@ export const CreateEventsController = async (req: Request, res: Response) => {
       eventLocation: z.string().optional(),
       presenterId: z.string().optional(),
       duration: z.string().optional(),
+      eventType: z.string().optional(),
     });
     const isValidBody = eventBody.safeParse(req.body);
     if (!isValidBody.success) {
@@ -70,6 +71,7 @@ export const CreateEventsController = async (req: Request, res: Response) => {
         id: uuidv4(),
         presenterId: presenterId || null,
         duration: duration || null,
+        eventType: req.body.eventType || "Orielix Officials",
       },
     });
 
