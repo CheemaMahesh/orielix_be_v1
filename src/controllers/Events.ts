@@ -17,6 +17,7 @@ export const CreateEventsController = async (req: Request, res: Response) => {
       userId,
       presenterId,
       duration,
+      eventType,
     } = req.body;
     const userDetails = await client.user.findUnique({
       where: {
@@ -88,6 +89,7 @@ export const CreateEventsController = async (req: Request, res: Response) => {
 
 export const GetEventsController = async (req: Request, res: Response) => {
   try {
+    const eventType = req.query.eventType as string | undefined;
     const { userId } = req.body;
     if (!userId) {
       res.status(400).json({
@@ -97,11 +99,24 @@ export const GetEventsController = async (req: Request, res: Response) => {
       return;
     }
 
-    const eventDetails = await client.event.findMany({
-      where: {
-        createdBy: String(userId),
-      },
-    });
+    let eventDetails: any[] = [];
+    if (eventType) {
+      eventDetails = await client.event.findMany({
+        where: {
+          createdBy: String(userId),
+          eventType: eventType,
+        },
+      });
+    }
+
+    // If eventType was given but no events found, or eventType not given, fetch all
+    if (!eventDetails || eventDetails.length === 0) {
+      eventDetails = await client.event.findMany({
+        where: {
+          createdBy: String(userId),
+        },
+      });
+    }
 
     if (!eventDetails || eventDetails.length === 0) {
       res.status(404).json({
@@ -113,7 +128,7 @@ export const GetEventsController = async (req: Request, res: Response) => {
 
     res.status(200).json({
       success: true,
-      message: "Event fetched successfully",
+      message: "Event(s) fetched successfully",
       events: eventDetails,
     });
   } catch (err) {

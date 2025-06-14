@@ -530,6 +530,7 @@ export const GetAllEventsForCustomerController = async (
   res: Response
 ) => {
   try {
+    const eventType = req.query.eventType as string | undefined;
     const userId = req.body.userId;
 
     if (!userId) {
@@ -540,11 +541,12 @@ export const GetAllEventsForCustomerController = async (
       return;
     }
 
-    // First, get all events
-    const events = await client.event.findMany({
+    // Get all events (filtered by eventType if provided)
+    let events = await client.event.findMany({
       where: {
         isDeleted: false,
         isActive: true,
+        ...(eventType ? { eventType } : {}),
       },
       include: {
         presenter: {
@@ -575,9 +577,10 @@ export const GetAllEventsForCustomerController = async (
     });
 
     if (!events || events.length === 0) {
-      res.status(404).json({
-        success: false,
+      res.status(200).json({
+        success: true,
         message: "No events found",
+        events: [],
       });
       return;
     }
@@ -590,28 +593,16 @@ export const GetAllEventsForCustomerController = async (
     const upcomingEvents = events
       .filter((event) => {
         if (!event.eventDate) return false;
-
-        // Parse ISO date string
         const eventDate = new Date(event.eventDate);
-
-        // If parsing failed, skip this event
         if (isNaN(eventDate.getTime())) return false;
-
-        // Remove time component for comparison
         eventDate.setHours(0, 0, 0, 0);
-
-        // Keep if event date is >= today
         return eventDate >= today;
       })
-      .map((event) => {
-        // Add isAlreadyJoined flag based on if we found the user in joinedUsers
-        return {
-          ...event,
-          joined: event.joinedUsers.length > 0,
-          // Remove joinedUsers from response to avoid sending a list of all users
-          joinedUsers: undefined,
-        };
-      });
+      .map((event) => ({
+        ...event,
+        joined: event.joinedUsers.length > 0,
+        joinedUsers: undefined,
+      }));
 
     res.status(200).json({
       success: true,
@@ -621,9 +612,10 @@ export const GetAllEventsForCustomerController = async (
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Internal server error" });
-    return;
   }
 };
+
+// Filter for upcoming
 
 export const getAllSessionsController = async (req: Request, res: Response) => {
   try {
