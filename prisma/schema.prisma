@@ -56,6 +56,8 @@ model User {
   institutionRank Int?
   Notifications Notifications[]
   profileImageId String?
+
+  calendar calendar[]
 }
 
 model event {
@@ -79,6 +81,7 @@ model event {
   presenter User? @relation("EventPresenters", fields: [presenterId], references: [id])
   joinedUsers User[] @relation("EventJoinedUsers")
   withbreaks Boolean @default(true)
+  calendar calendar[]
 }
 
 model Notifications {
@@ -117,6 +120,20 @@ model Session{
   presenterId String?
   presenter User? @relation("SessionPresenters", fields: [presenterId], references: [id])
   category String?
+  calendar calendar[]
+}
+
+model calendar {
+  id String @id
+  userId String
+  eventId String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isDeleted Boolean @default(false)
+  user User @relation(fields: [userId], references: [id])
+  event event? @relation(fields: [eventId], references: [id])
+  sessionId String?
+  session Session? @relation(fields: [sessionId], references: [id])
 }
 
 

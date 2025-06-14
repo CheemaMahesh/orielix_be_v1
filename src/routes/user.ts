@@ -35,6 +35,7 @@ import {
   JoinInSessionController,
   LeaveSessionController,
 } from "../controllers/Preferences";
+import { getAllCalenderController } from "../controllers/Calender";
 
 export const userRouter = Router();
 
@@ -107,3 +108,6 @@ userRouter.patch(
   isValidToken,
   UpdateUserProfileWithIdController
 );
+
+// ---------------------------------------calendar routes-----------------------------------
+userRouter.get("/getallcalendar", isValidToken, getAllCalenderController);
