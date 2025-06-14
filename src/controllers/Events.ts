@@ -72,7 +72,7 @@ export const CreateEventsController = async (req: Request, res: Response) => {
         id: uuidv4(),
         presenterId: presenterId || null,
         duration: duration || null,
-        eventType: req.body.eventType || "Orielix Officials",
+        eventType: eventType || "Orielix Officials",
       },
     });
 
@@ -186,6 +186,10 @@ export const UpdateEventsController = async (req: Request, res: Response) => {
 
     if (req.body.duration && req.body.duration.trim() !== "") {
       updateBody.duration = req.body.duration;
+    }
+
+    if (req.body.eventType && req.body.eventType.trim() !== "") {
+      updateBody.eventType = req.body.eventType;
     }
 
     if (Object.keys(updateBody).length === 0) {

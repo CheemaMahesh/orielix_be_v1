@@ -16,6 +16,9 @@ export const CreateSessionController = async (req: Request, res: Response) => {
       userId,
       duration,
       presenterId,
+      category,
+      type,
+      location,
     } = req.body;
     const userDetails = await client.user.findUnique({
       where: {
@@ -45,6 +48,9 @@ export const CreateSessionController = async (req: Request, res: Response) => {
       time: z.string(),
       duration: z.string(),
       presenterId: z.string().optional(),
+      category: z.string().optional(),
+      type: z.string().optional(),
+      location: z.string().optional(),
     });
     const isValidBody = eventBody.safeParse(req.body);
     if (!isValidBody.success) {
@@ -67,6 +73,9 @@ export const CreateSessionController = async (req: Request, res: Response) => {
         duration,
         id: uuidv4(),
         presenterId: presenterId ? String(presenterId) : null,
+        category: category ? String(category) : null,
+        type: type ? String(type) : null,
+        location,
       },
     });
 
@@ -135,39 +144,40 @@ export const UpdateSessionController = async (req: Request, res: Response) => {
     if (req.body.name && req.body.name.trim() !== "") {
       updateBody.name = req.body.name;
     }
-
     if (req.body.description && req.body.description.trim() !== "") {
       updateBody.description = req.body.description;
     }
-
     if (req.body.date && req.body.date.trim() !== "") {
       updateBody.date = req.body.date;
     }
-
     if (req.body.image && req.body.image.trim() !== "") {
       updateBody.image = req.body.image;
     }
-
     if (req.body.time && req.body.time.trim() !== "") {
       updateBody.time = req.body.time;
     }
-
     if (req.body.location && req.body.location.trim() !== "") {
       updateBody.location = req.body.location;
     }
-
     if (req.body.isActive !== undefined) {
       updateBody.isActive = Boolean(req.body.isActive);
     }
-
+    // Use presenter relation instead of presenterId
     if (req.body.presenterId && req.body.presenterId.trim() !== "") {
-      updateBody.presenterId = req.body.presenterId;
+      updateBody.presenter = { connect: { id: req.body.presenterId } };
     }
     if (req.body.duration && req.body.duration.trim() !== "") {
       updateBody.duration = req.body.duration;
     }
     if (req.body.isDeleted !== undefined) {
       updateBody.isDeleted = Boolean(req.body.isDeleted);
+    }
+    // Use category if that's your schema field, otherwise use category
+    if (req.body.category && req.body.category.trim() !== "") {
+      updateBody.category = req.body.category;
+    }
+    if (req.body.type && req.body.type.trim() !== "") {
+      updateBody.type = req.body.type;
     }
 
     if (Object.keys(updateBody).length === 0) {
@@ -185,7 +195,6 @@ export const UpdateSessionController = async (req: Request, res: Response) => {
       data: updateBody,
     });
 
-    // Send response
     res.status(200).json({
       success: true,
       message: "Event updated successfully",

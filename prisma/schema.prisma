@@ -116,6 +116,7 @@ model Session{
   joinedUsers User[] @relation("SessionJoinedUsers")
   presenterId String?
   presenter User? @relation("SessionPresenters", fields: [presenterId], references: [id])
+  category String?
 }
 
 

@@ -620,6 +620,7 @@ export const GetAllEventsForCustomerController = async (
 export const getAllSessionsController = async (req: Request, res: Response) => {
   try {
     const userId = req.body.userId;
+    const { category, type } = req.query;
 
     if (!userId) {
       res.status(400).json({
@@ -629,10 +630,13 @@ export const getAllSessionsController = async (req: Request, res: Response) => {
       return;
     }
 
+    // Build dynamic where clause
+    const whereClause: any = { isDeleted: false };
+    if (category) whereClause.category = category; // <-- fix here
+    if (type) whereClause.type = type;
+
     const sessions = await client.session.findMany({
-      where: {
-        isDeleted: false,
-      },
+      where: whereClause,
       include: {
         presenter: {
           select: {
@@ -659,9 +663,10 @@ export const getAllSessionsController = async (req: Request, res: Response) => {
     });
 
     if (!sessions || sessions.length === 0) {
-      res.status(404).json({
-        success: false,
+      res.status(200).json({
+        success: true,
         message: "No sessions found",
+        sessions: [],
       });
       return;
     }
