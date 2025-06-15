@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { v4 as uuidv4 } from "uuid";
 import ImageKit from "imagekit";
+import { getRandomeString } from "../utils/functions";
 
 const client = new PrismaClient();
 const imagekit = new ImageKit({
@@ -51,6 +52,9 @@ export const SignUpController = async (req: Request, res: Response) => {
           userType: "Customer",
           isVerified: true,
           id: uuidv4(),
+          stateRank: Math.floor(Math.random() * 333) + 5000,
+          countryRank: Math.floor(Math.random() * 444) + 5000,
+          institutionRank: Math.floor(Math.random() * 444) + 10,
         },
       });
 
@@ -745,6 +749,10 @@ export const JoinWithGoogleAuth = async (req: Request, res: Response) => {
         id: uuidv4(),
         password: "",
         isJoinedWithGoogle: true,
+        stateRank: Math.floor(Math.random() * 333) + 5000,
+        countryRank: Math.floor(Math.random() * 444) + 5000,
+        institutionRank: Math.floor(Math.random() * 444) + 10,
+        username: getRandomeString({ length: 10 }),
       },
     });
     if (!newUser.id) {
@@ -981,6 +989,8 @@ export const CreateTestUsersController = async (
         email: `testuser${i}@example.com`,
         password: await bcrypt.hash(`Password${i}!`, 8),
         username: `testuser${i}`,
+        firstName: `TestUser${i}`,
+        lastName: `LastName${i}`,
         country,
         state: states[0],
         institution,
@@ -1000,6 +1010,8 @@ export const CreateTestUsersController = async (
         email: `testuser${i}@example.com`,
         password: await bcrypt.hash(`Password${i}!`, 8),
         username: `testuser${i}`,
+        firstName: `TestUser${i + Math.random() * 10}`,
+        lastName: `LastName${i + Math.random() * 10}`,
         country,
         state: states[1],
         institution,
@@ -1019,6 +1031,8 @@ export const CreateTestUsersController = async (
         email: `testuser${i}@example.com`,
         password: await bcrypt.hash(`Password${i}!`, 8),
         username: `testuser${i}`,
+        firstName: `TestUser${i + Math.random() * 990}`,
+        lastName: `LastName${i + Math.random() * 990}`,
         country,
         state: states[2],
         institution,
