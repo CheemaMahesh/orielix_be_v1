@@ -94,7 +94,7 @@ userRouter.post(
 userRouter.post("/google", JoinWithGoogleAuth);
 
 // -------------------------------------create test users-------------------------------------
-userRouter.post("/create/test", CreateTestUsersController);
+// userRouter.post("/create/test", CreateTestUsersController);
 
 // -------------------------------------UploadProfile-------------------------------------
 userRouter.get(

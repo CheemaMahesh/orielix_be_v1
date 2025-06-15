@@ -53,7 +53,7 @@ export const SignUpController = async (req: Request, res: Response) => {
           isVerified: true,
           id: uuidv4(),
           stateRank: Math.floor(Math.random() * 333) + 5000,
-          countryRank: Math.floor(Math.random() * 444) + 5000,
+          countryRank: Math.floor(Math.random() * 444) + 2000,
           institutionRank: Math.floor(Math.random() * 444) + 10,
         },
       });
@@ -750,7 +750,7 @@ export const JoinWithGoogleAuth = async (req: Request, res: Response) => {
         password: "",
         isJoinedWithGoogle: true,
         stateRank: Math.floor(Math.random() * 333) + 5000,
-        countryRank: Math.floor(Math.random() * 444) + 5000,
+        countryRank: Math.floor(Math.random() * 444) + 2000,
         institutionRank: Math.floor(Math.random() * 444) + 10,
         username: getRandomeString({ length: 10 }),
       },
