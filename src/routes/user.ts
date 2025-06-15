@@ -19,6 +19,7 @@ import {
   CreateTestUsersController,
   UpdateUserProfileController,
   UpdateUserProfileWithIdController,
+  SendOtpToEmailController,
 } from "../controllers/Users";
 import { isValidToken } from "../middlewares/auth";
 import {
@@ -42,6 +43,10 @@ export const userRouter = Router();
 // Auth routes
 userRouter.post("/signup", SignUpController);
 userRouter.post("/login", SigninController);
+
+userRouter.get("/getOtp", SendOtpToEmailController);
+userRouter.post("/verifyOtp", () => {});
+
 userRouter.get("/me", isValidToken, MeController);
 // userRouter.put("/update", isValidToken, UpdateUserController); //Unfinished
 userRouter.get("/getall", isValidToken, getAllUserByAdmin);
