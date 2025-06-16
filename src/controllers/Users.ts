@@ -423,7 +423,7 @@ export const DeleteIntrestController = async (req: Request, res: Response) => {
       return;
     }
     const updatedInterests = user.interests.filter(
-      (interest) => interest !== intrest
+      (interest: any) => interest !== intrest
     );
     const updatedUser = await client.user.update({
       where: {
@@ -609,14 +609,14 @@ export const GetAllEventsForCustomerController = async (
 
     // Filter for upcoming events and add isAlreadyJoined flag
     const upcomingEvents = events
-      .filter((event) => {
+      .filter((event: any) => {
         if (!event.eventDate) return false;
         const eventDate = new Date(event.eventDate);
         if (isNaN(eventDate.getTime())) return false;
         eventDate.setHours(0, 0, 0, 0);
         return eventDate >= today;
       })
-      .map((event) => ({
+      .map((event: any) => ({
         ...event,
         joined: event.joinedUsers.length > 0,
         joinedUsers: undefined,
@@ -689,9 +689,9 @@ export const getAllSessionsController = async (req: Request, res: Response) => {
       return;
     }
 
-    const sessionsWithJoinedFlag = sessions.map((session) => ({
+    const sessionsWithJoinedFlag = sessions.map((session: any) => ({
       ...session,
-      joined: session.joinedUsers.some((user) => user.id === userId),
+      joined: session.joinedUsers.some((user: any) => user.id === userId),
     }));
 
     res.status(200).json({

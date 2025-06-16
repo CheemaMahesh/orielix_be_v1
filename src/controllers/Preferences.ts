@@ -145,7 +145,7 @@ export const getallintrestsController = async (req: Request, res: Response) => {
 
     res.status(200).json({
       success: true,
-      intrests: intrests?.map((intrest) => ({
+      intrests: intrests?.map((intrest: any) => ({
         id: intrest.id,
         name: intrest.name,
         description: intrest.description,
@@ -312,7 +312,7 @@ export const getallrolesController = async (req: Request, res: Response) => {
     }
     res.status(200).json({
       success: true,
-      roles: roles?.map((role) => ({
+      roles: roles?.map((role: any) => ({
         id: role.id,
         name: role.name,
         description: role.description,
