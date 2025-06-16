@@ -45,7 +45,7 @@ userRouter.post("/signup", SignUpController);
 userRouter.post("/login", SigninController);
 
 userRouter.get("/getOtp", SendOtpToEmailController);
-userRouter.post("/verifyOtp", () => {});
+// userRouter.post("/verifyOtp", SendOtpToEmailController);
 
 userRouter.get("/me", isValidToken, MeController);
 // userRouter.put("/update", isValidToken, UpdateUserController); //Unfinished

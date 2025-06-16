@@ -174,6 +174,11 @@ export const SigninController = async (req: Request, res: Response) => {
 export const SendOtpToEmailController = async (req: Request, res: Response) => {
   try {
     const { email } = req.params;
+    res.status(200).json({
+      success: true,
+      message: "OTP sent to email",
+      email,
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Internal server error" });
