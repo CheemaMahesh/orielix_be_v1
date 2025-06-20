@@ -223,9 +223,9 @@ export const VerifyEmailOTPController = async (req: Request, res: Response) => {
 
 export const UpdatePasswordController = async (req: Request, res: Response) => {
   try {
-    const { email, newPassword } = req.body;
-    if (!email || !newPassword) {
-      res.status(400).json({
+    const { email, password } = req.body;
+    if (!email || !password) {
+      res.status(200).json({
         success: false,
         message: "Email and new password are required",
       });
@@ -233,7 +233,7 @@ export const UpdatePasswordController = async (req: Request, res: Response) => {
     }
 
     // Validate new password (example: min 6 chars)
-    if (typeof newPassword !== "string" || newPassword.length < 6) {
+    if (typeof password !== "string" || password.length < 6) {
       res.status(400).json({
         success: false,
         message: "Password must be at least 6 characters long",
@@ -243,14 +243,14 @@ export const UpdatePasswordController = async (req: Request, res: Response) => {
 
     const user = await client.user.findUnique({ where: { email } });
     if (!user) {
-      res.status(404).json({
+      res.status(200).json({
         success: false,
         message: "User not found",
       });
       return;
     }
 
-    const hashedPassword = await bcrypt.hash(newPassword, 8);
+    const hashedPassword = await bcrypt.hash(password, 8);
     await client.user.update({
       where: { email },
       data: { password: hashedPassword, updatedAt: new Date() },
