@@ -20,6 +20,8 @@ import {
   UpdateUserProfileController,
   UpdateUserProfileWithIdController,
   SendOtpToEmailController,
+  VerifyEmailOTPController,
+  UpdatePasswordController,
 } from "../controllers/Users";
 import { isValidToken } from "../middlewares/auth";
 import {
@@ -45,7 +47,8 @@ userRouter.post("/signup", SignUpController);
 userRouter.post("/login", SigninController);
 
 userRouter.get("/getOtp", SendOtpToEmailController);
-// userRouter.post("/verifyOtp", SendOtpToEmailController);
+userRouter.post("/verifyOtp", VerifyEmailOTPController);
+userRouter.post("/updatepassword", UpdatePasswordController);
 
 userRouter.get("/me", isValidToken, MeController);
 // userRouter.put("/update", isValidToken, UpdateUserController); //Unfinished

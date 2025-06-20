@@ -188,6 +188,84 @@ export const SendOtpToEmailController = async (req: Request, res: Response) => {
   }
 };
 
+export const VerifyEmailOTPController = async (req: Request, res: Response) => {
+  try {
+    // TODO if the otp is 123456 in number or string format send it as success
+    const { otp } = req.body;
+    const validateOtp = z.object({
+      otp: z.string().length(6, "OTP must be 6 characters long"),
+    });
+    const isValidBody = validateOtp.safeParse(req.body);
+    if (!isValidBody.success) {
+      res.status(400).json({
+        success: false,
+        message: "Invalid request body",
+        errors: isValidBody.error.flatten(),
+      });
+      return;
+    }
+    if (otp === "123456") {
+      res.status(200).json({
+        success: true,
+        message: "OTP verified successfully",
+      });
+    } else {
+      res.status(400).json({
+        success: false,
+        message: "Invalid OTP",
+      });
+    }
+  } catch (err) {
+    console.error(err);
+    throw new Error("Internal server error");
+  }
+};
+
+export const UpdatePasswordController = async (req: Request, res: Response) => {
+  try {
+    const { email, newPassword } = req.body;
+    if (!email || !newPassword) {
+      res.status(400).json({
+        success: false,
+        message: "Email and new password are required",
+      });
+      return;
+    }
+
+    // Validate new password (example: min 6 chars)
+    if (typeof newPassword !== "string" || newPassword.length < 6) {
+      res.status(400).json({
+        success: false,
+        message: "Password must be at least 6 characters long",
+      });
+      return;
+    }
+
+    const user = await client.user.findUnique({ where: { email } });
+    if (!user) {
+      res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+      return;
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 8);
+    await client.user.update({
+      where: { email },
+      data: { password: hashedPassword, updatedAt: new Date() },
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Password updated successfully",
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
 export const MeController = async (req: Request, res: Response) => {
   try {
     const userId = req.body.userId;

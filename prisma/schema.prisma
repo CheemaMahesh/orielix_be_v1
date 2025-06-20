@@ -136,6 +136,12 @@ model calendar {
   session Session? @relation(fields: [sessionId], references: [id])
 }
 
+model otp {
+  id String @id
+  email String
+  lastOtp String
+}
+
 
 model Interest {
   id String @id
