@@ -122,14 +122,12 @@ export const SigninController = async (req: Request, res: Response) => {
     const { email, password } = req.body;
     const validateUser = z.object({
       email: z.string().email(),
-      password: z.string().min(8).max(20),
+      password: z.string().min(6).max(40),
     });
     const isValidBody = validateUser.safeParse(req.body);
     if (isValidBody.success) {
       const existingUser = await client.user.findFirst({
-        where: {
-          email,
-        },
+        where: { email },
       });
       if (!existingUser?.email) {
         res.status(400).json({
@@ -139,19 +137,18 @@ export const SigninController = async (req: Request, res: Response) => {
         return;
       }
 
-      const currentPassword = await bcrypt.compare(
-        existingUser.password,
-        password
+      // FIX: Correct bcrypt.compare usage
+      const isPasswordValid = await bcrypt.compare(
+        password,
+        existingUser.password
       );
 
-      if (!currentPassword) {
-        if (!existingUser.email) {
-          res.status(400).json({
-            message: "Email or password is incorrect",
-            success: false,
-          });
-          return;
-        }
+      if (!isPasswordValid) {
+        res.status(400).json({
+          message: "Email or password is incorrect",
+          success: false,
+        });
+        return;
       }
 
       const token = jwt.sign(
@@ -163,6 +160,12 @@ export const SigninController = async (req: Request, res: Response) => {
         success: true,
         message: "Login successful",
         token,
+      });
+    } else {
+      res.status(200).json({
+        success: false,
+        message: "Invalid request body",
+        errors: isValidBody.error.flatten(),
       });
     }
   } catch (err) {
